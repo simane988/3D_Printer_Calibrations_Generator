@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# G-Code files
+*.gcode
+
 # Distribution / packaging
 .Python
 build/
