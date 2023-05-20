@@ -1,36 +1,29 @@
+import sys
+
+
 def generate_json():
-    json_sample = """
-    {
-        "bed_size_x" : "235",
-        bed_size_y=235,
-        z_offset=0.0,
-        is_center_zero=False,
-        is_autocalibrate=False,
-        layer_width=0.4,
-        first_layer_width=0.6,
-        layer_height=0.2,
-        layer_speed=60,
-        first_layer_speed=30,
-        travel_speed=150,
-        linear_advance="",
-        preheat_hotend=210,
-        preheat_bed=60,
-        start_fan_speed=10,
-        file_name="Test.gcode",
-    }
-"""
+    pass
+
 
 def choose_json():
     pass
 
 
-def main():
-    print("Создать новую конфигурацию?[д/н]")
-    if str(input()) in ['Д', 'д', 'Y', 'y']:
-        generate_json()
-    else:
-        choose_json()
+def main(args):
+    if len(args) == 1:
+        print("Программе для работы требуются передаваемые флаги, для справки используйте \'-h\'")
+        return
+    if args[1] in ('-h', '--help'):
+        print("Help text")
+    if args[1] in ('-cd', '--configdir'):
+        pass
+    if args[1] in ('-nc', '--newconfig'):
+        pass
+    if args[1] in ('-cf', '--configfile'):
+        pass
+    if args[1] in ('-o', '--output'):
+        pass
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv)
