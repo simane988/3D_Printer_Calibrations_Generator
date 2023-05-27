@@ -1,6 +1,3 @@
-import os
-
-
 class GCodeProgram:
 
     def __init__(
@@ -19,7 +16,7 @@ class GCodeProgram:
             linear_advance="",
             preheat_hotend=210,
             preheat_bed=60,
-            start_fan_speed=0,
+            fan_speed=0,
             file_name="Test.gcode",
     ):
         """
@@ -40,7 +37,7 @@ class GCodeProgram:
         :param str linear_advance: Коэффициент Linear (Pressure) Advance
         :param int preheat_hotend: Температура прогрева хотенда
         :param int preheat_bed: Температура прогрева стола
-        :param float start_fan_speed: Начальная скорость вентилятора
+        :param float fan_speed: Основная скорость вентилятора
         :param str file_name: Название итогового G-Code файла
         """
         self.file = None
@@ -138,11 +135,11 @@ class GCodeProgram:
             raise TypeError(f"preheat_bed должен быть типа int, а не {type(preheat_bed)}.") from None
 
         try:
-            if start_fan_speed < 0 or start_fan_speed > 100:
-                raise ValueError("Начальная скорость вентилятора (start_fan_speed) не может быть меньше 0% и больше 100%.")
-            self.start_fan_speed = float(start_fan_speed)
+            if fan_speed < 0 or fan_speed > 100:
+                raise ValueError("Начальная скорость вентилятора (fan_speed) не может быть меньше 0% и больше 100%.")
+            self.fan_speed = float(fan_speed)
         except TypeError:
-            raise TypeError(f"start_fan_speed должен быть типа float, а не {type(start_fan_speed)}.") from None
+            raise TypeError(f"fan_speed должен быть типа float, а не {type(fan_speed)}.") from None
 
         try:
             self.file_name = str(file_name)
@@ -164,7 +161,7 @@ class GCodeProgram:
                         f"G92 E0\n"
                         f"G90\n"
                         f"M82\n"
-                        f"M106 S{int(255/100*self.start_fan_speed)}\n"
+                        f"M106 S{int(255/100*self.fan_speed)}\n"
                         f"; start of gcode\n")
 
     def after_end(self):
@@ -194,21 +191,23 @@ class GCodeProgram:
         :param bool is_hotend_wait: Нужно ли ждать нагрева экструдера
         :param bool is_bed_wait: Нужно ли ждать нагрева стола
         """
-        if 0 <= bed_temp <= 150:
-            if is_bed_wait:
-                self.file.write(f"M190 S{bed_temp}\n")
+        if bed_temp:
+            if 0 <= bed_temp <= 150:
+                if is_bed_wait:
+                    self.file.write(f"M190 S{bed_temp}\n")
+                else:
+                    self.file.write(f"M140 S{bed_temp}\n")
             else:
-                self.file.write(f"M140 S{bed_temp}\n")
-        else:
-            raise ValueError("Температура стола (bed_temp) не может быть меньше 0°C и больше 150°C.")
+                raise ValueError("Температура стола (bed_temp) не может быть меньше 0°C и больше 150°C.")
 
-        if 150 <= hotend_temp <= 350:
-            if is_hotend_wait:
-                self.file.write(f"M109 S{hotend_temp}\n")
+        if hotend_temp:
+            if 150 <= hotend_temp <= 350:
+                if is_hotend_wait:
+                    self.file.write(f"M109 S{hotend_temp}\n")
+                else:
+                    self.file.write(f"M104 S{hotend_temp}\n")
             else:
-                self.file.write(f"M104 S{hotend_temp}\n")
-        else:
-            raise ValueError("Температура хотенда (hotend_temp) не может быть меньше 150°C и больше 350°C.")
+                raise ValueError("Температура хотенда (hotend_temp) не может быть меньше 150°C и больше 350°C.")
 
     def set_fan_speed(self, fan_speed):
         """
@@ -239,15 +238,15 @@ class GCodeProgram:
         :param F: Скорость экструзии
         """
         command = "G1"
-        if X:
+        if X is not None:
             command += f" X{X}"
-        if Y:
+        if Y is not None:
             command += f" Y{Y}"
-        if Z:
+        if Z is not None:
             command += f" Z{Z}"
-        if E:
+        if E is not None:
             command += f" E{E}"
-        if F:
+        if F is not None:
             command += f" F{F}"
         command += "\n"
         self.file.write(command)
@@ -269,7 +268,7 @@ if __name__ == "__main__":
         linear_advance="",
         preheat_hotend=210,
         preheat_bed=60,
-        start_fan_speed=10,
+        fan_speed=10,
         file_name="Test.gcode",
     )
     gcodep.before_start()
