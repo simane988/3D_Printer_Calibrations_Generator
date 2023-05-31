@@ -42,11 +42,11 @@ def choose_json():
 
 def generate_gcode(conf, out_path):
     square_commands = [
-        {"X": 12.5, "Y": 12.5, "F": 1800},
-        {"X": -12.5, "F": 1800},
-        {"Y": -12.5, "F": 1800},
-        {"X": 12.5, "F": 1800},
-        {"Y": 12.5, "F": 1800}
+        {"X": 12.5, "Y": 12.5, "F": conf["layer_speed"] * 60},
+        {"X": -12.5, "F": conf["layer_speed"] * 60},
+        {"Y": -12.5, "F": conf["layer_speed"] * 60},
+        {"X": 12.5, "F": conf["layer_speed"] * 60},
+        {"Y": 12.5, "F": conf["layer_speed"] * 60}
     ]
 
     gcp = GCodeProgram(
@@ -67,7 +67,6 @@ def generate_gcode(conf, out_path):
         fan_speed=conf["fan_speed"],
         file_name=out_path
     )
-    gcp.before_start()
 
     if gcp.is_center_zero:
         offset_x = 0
@@ -81,7 +80,13 @@ def generate_gcode(conf, out_path):
     cur_temp = gcp.preheat_hotend
     delta_temp = (conf["end_hotend_temp"] - conf["start_hotend_temp"])/(conf["num_of_segments"] - 1)
 
-    cur_z_pos = 0
+    cur_z_pos = round(gcp.layer_height, 3)
+
+    for i in range(conf["num_of_segments"]):
+        gcp.file.write(f"; Segment {i}, temp {round(cur_temp + delta_temp * i, 1)}\n")
+
+    gcp.before_start()
+
     for segment in range(conf["num_of_segments"]):
         for layer in range(layers_in_segment):
             gcp.linear_move(Z=cur_z_pos)
@@ -148,7 +153,7 @@ def main(args):
             generate_gcode(conf, out_path)
 
         else:
-            print("trouble")
+            print("Файл конфигурации указан неправильно.")
 
         return
 

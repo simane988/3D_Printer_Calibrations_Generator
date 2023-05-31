@@ -1,0 +1,21 @@
+{
+        "bed_size_x": 235,
+        "bed_size_y": 235,
+        "is_center_zero": true,
+        "is_autocalibrate": false,
+        "layer_width": 0.4,
+        "first_layer_width": 0.6,
+        "layer_height": 0.2,
+        "z_offset": 0.0,
+        "layer_speed": 60,
+        "first_layer_speed": 30,
+        "travel_speed": 150,
+        "linear_advance": "",
+        "preheat_bed": 60,
+        "fan_speed": 100,
+        "file": "Test.gcode",
+        "preheat_hotend": 200,
+        "num_of_segments": 7,
+        "segment_height": 5
+}
+    
